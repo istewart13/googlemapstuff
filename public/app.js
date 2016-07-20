@@ -1,5 +1,5 @@
 var Map = function(latLng, zoom) {
-  this.googleMap = new google.maps.Map(document.getElementById('map'), {
+  this.googleMap = new google.maps.Map(document.getElementById("theMap"), {
       center: latLng, 
       zoom: zoom
   });
@@ -49,9 +49,14 @@ var main = function (countries) {
     document.querySelector('#info').style.display = 'block';
     
     var button = document.getElementById('btn');
-    console.log(button);
-    var locator = new GeoLocator(map);
-    button.onclick = function(){ locator.setCenter() };
+
+    var center = {lat: 0, lng: 0};
+    var map = new Map(center, 16);
+
+    button.onclick = function(event) {
+        var locator = new GeoLocator(map);
+        locator.setCenter();
+    }
 }
 
 var GeoLocator = function(map) {
@@ -59,10 +64,14 @@ var GeoLocator = function(map) {
   this.setCenter = function() {
     navigator.geolocation.getCurrentPosition(function(response) { 
       var pos = { lat: response.coords.latitude, lng: response.coords.longitude }
-      console.log(this.map);
-      this.map.googleMap.panTo(pos);
+      var geocoder = new google.maps.Geocoder;
+      geocoder.geocode({'location': pos}, function(results) {
+        console.log(results[0].address_components[4].long_name);
+      });
+      this.map.googleMap = new Map(pos, 12)
   }.bind(this))
 }
+
 }
 
 var populateSelect = function (countries) {
